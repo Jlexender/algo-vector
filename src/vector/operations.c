@@ -1,8 +1,8 @@
 #include <malloc.h>
 #include <stddef.h>
 #include <stdbool.h>
-#include "include/vector/header.h"
-#include "include/vector/operations.h"
+#include "../include/vector/header.h"
+#include "../include/vector/operations.h"
 
 static long *get_address(vector_header *header, int offset)
 {
@@ -19,11 +19,13 @@ static void invalidate(vector_header *header)
     header->is_allocated = 0;
 }
 
-static operation_result grow_vector(vector_header *header) {
+static operation_result grow_vector(vector_header *header)
+{
     int new_capacity = header->capacity * 2;
-    long* new_start_address = realloc(header->start_address, new_capacity * sizeof(long));
+    long *new_start_address = realloc(header->start_address, new_capacity * sizeof(long));
 
-    if (new_start_address == NULL) {
+    if (new_start_address == NULL)
+    {
         return ERR_REALLOC_FAILED;
     }
 
@@ -81,8 +83,7 @@ vector_header init_vector(int capacity)
         actual_capacity};
 }
 
-
-operation_result pop_back(vector_header* header)
+operation_result pop_back(vector_header *header)
 {
     if (is_invalid(header))
     {
@@ -91,31 +92,61 @@ operation_result pop_back(vector_header* header)
 
     if (header->size == 0)
     {
-        return (operation_result){
-            OK,
-            header};
+        return OK;
     }
-
     header->size--;
 
-    return (operation_result){
-        OK,
-        header};
+    return OK;
 }
 
-operation_result push_back(vector_header* header, long value) {
-    if (is_invalid(header)) {
+operation_result push_back(vector_header *header, long value)
+{
+    if (is_invalid(header))
+    {
         return ERR_INVALID_HEADER;
     }
 
-    if (header->size == header->capacity) {
+    if (header->size == header->capacity)
+    {
         operation_result result = grow_vector(header);
-        if (result != OK) {
+        if (result != OK)
+        {
             return result;
         }
     }
 
     *get_address(header, header->size) = value;
     header->size++;
+    return OK;
+}
+
+long at(vector_header *header, int index)
+{
+    if (is_invalid(header))
+    {
+        return 0;
+    }
+
+    if (index < 0 || index >= header->size)
+    {
+        return 0;
+    }
+
+    return *get_address(header, index);
+}
+
+operation_result set(vector_header *header, int index, long value)
+{
+    if (is_invalid(header))
+    {
+        return ERR_INVALID_HEADER;
+    }
+
+    if (index < 0 || index >= header->size)
+    {
+        return ERR_OUT_OF_BOUNDS;
+    }
+
+    *get_address(header, index) = value;
     return OK;
 }
