@@ -21,6 +21,11 @@ static void invalidate(vector_header *header)
 
 static operation_result grow_vector(vector_header *header)
 {
+    if (is_invalid(header))
+    {
+        return ERR_INVALID_HEADER;
+    }
+
     int new_capacity = header->capacity * 2;
     long *new_start_address = realloc(header->start_address, new_capacity * sizeof(long));
 
@@ -83,53 +88,16 @@ vector_header init_vector(int capacity)
         actual_capacity};
 }
 
-operation_result pop_back(vector_header *header)
+long get(vector_header *header, int index)
 {
     if (is_invalid(header))
     {
         return ERR_INVALID_HEADER;
-    }
-
-    if (header->size == 0)
-    {
-        return OK;
-    }
-    header->size--;
-
-    return OK;
-}
-
-operation_result push_back(vector_header *header, long value)
-{
-    if (is_invalid(header))
-    {
-        return ERR_INVALID_HEADER;
-    }
-
-    if (header->size == header->capacity)
-    {
-        operation_result result = grow_vector(header);
-        if (result != OK)
-        {
-            return result;
-        }
-    }
-
-    *get_address(header, header->size) = value;
-    header->size++;
-    return OK;
-}
-
-long at(vector_header *header, int index)
-{
-    if (is_invalid(header))
-    {
-        return 0;
     }
 
     if (index < 0 || index >= header->size)
     {
-        return 0;
+        return ERR_OUT_OF_BOUNDS;
     }
 
     return *get_address(header, index);
@@ -149,4 +117,67 @@ operation_result set(vector_header *header, int index, long value)
 
     *get_address(header, index) = value;
     return OK;
+}
+
+operation_result insert(vector_header *header, int index, long value)
+{
+    if (is_invalid(header))
+    {
+        return ERR_INVALID_HEADER;
+    }
+
+    if (index < 0 || index > header->size)
+    {
+        return ERR_OUT_OF_BOUNDS;
+    }
+
+    if (header->capacity == header->size)
+    {
+        operation_result grow_result = grow_vector(header);
+        if (grow_result != OK)
+        {
+            return grow_result;
+        }
+    }
+
+    header->size++;
+
+    for (int i = header->size - 1; i > index; --i)
+    {
+        *get_address(header, i) = *get_address(header, i - 1);
+    }
+
+    *get_address(header, index) = value;
+    return OK;
+}
+
+operation_result push_back(vector_header *header, long value)
+{
+    return insert(header, header->size, value);
+}
+
+operation_result erase(vector_header *header, int index)
+{
+    if (is_invalid(header))
+    {
+        return ERR_INVALID_HEADER;
+    }
+
+    if (index < 0 || index >= header->size)
+    {
+        return ERR_OUT_OF_BOUNDS;
+    }
+
+    for (int i = index; i < header->size - 1; ++i)
+    {
+        *get_address(header, i) = *get_address(header, i + 1);
+    }
+
+    --header->size;
+    return OK;
+}
+
+operation_result pop_back(vector_header *header)
+{
+    return erase(header, header->size - 1);
 }

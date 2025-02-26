@@ -13,9 +13,10 @@ typedef enum {
 
 vector_header init_vector(int capacity);
 operation_result free_vector(vector_header* header);
-operation_result push_back(vector_header* header, long value);
-operation_result pop_back(vector_header* header);
-long at(vector_header* header, int index);
+long get(vector_header* header, int index);
 operation_result set(vector_header* header, int index, long value);
-
+operation_result insert(vector_header *header, int index, long value);
+operation_result push_back(vector_header* header, long value);
+operation_result erase(vector_header *header, int index);
+operation_result pop_back(vector_header* header);
 
