@@ -1,105 +1,121 @@
 #include <malloc.h>
 #include <stddef.h>
+#include <stdbool.h>
 #include "include/vector/header.h"
 #include "include/vector/operations.h"
 
-static void* get_address(vector_header header, int offset) {
-    return header.start_address + offset * sizeof(long);
+static long *get_address(vector_header *header, int offset)
+{
+    return header->start_address + offset * sizeof(long);
 }
 
-static int is_invalid(vector_header header) {
-    return header.is_allocated == 0;
+static int is_invalid(vector_header *header)
+{
+    return !header->is_allocated;
 }
 
-static vector_header get_invalid_header() {
-    return (vector_header) {
-        0,
-        NULL,
-        0,
-        0
-    };
+static void invalidate(vector_header *header)
+{
+    header->is_allocated = 0;
 }
 
-operation_result free_vector(vector_header header) {
-    vector_header invalid_header = get_invalid_header();
+static operation_result grow_vector(vector_header *header) {
+    int new_capacity = header->capacity * 2;
+    long* new_start_address = realloc(header->start_address, new_capacity * sizeof(long));
 
-    if (is_invalid(header)) {
-        return (operation_result) {
-            ERR_NOT_ALLOCATED,
-            invalid_header
-        };
+    if (new_start_address == NULL) {
+        return ERR_REALLOC_FAILED;
+    }
+
+    header->start_address = new_start_address;
+    header->capacity = new_capacity;
+
+    return OK;
+}
+
+operation_result free_vector(vector_header *header)
+{
+    if (is_invalid(header))
+    {
+        return ERR_INVALID_HEADER;
     }
 
     free(get_address(header, 0));
-    set_free(header);
+    invalidate(header);
 
-    return (operation_result) {
-        OK,
-        invalid_header
-    };
+    return OK;
 }
 
-operation_result init_vector(int capacity) {
-    vector_header invalid_header = get_invalid_header();
-
-    if (capacity <= 0) {
-        return (operation_result) {
-            ERR_INVALID_CAPACITY,
-            invalid_header
-        };
+vector_header init_vector(int capacity)
+{
+    if (capacity <= 0)
+    {
+        return (vector_header){
+            false,
+            NULL,
+            0,
+            0};
     }
 
     int actual_capacity = MIN_CAPACITY;
-    while (actual_capacity < capacity) {
+    while (actual_capacity < capacity)
+    {
         actual_capacity <<= 1;
     }
 
     void *start_address = malloc(actual_capacity * sizeof(long));
-    if (start_address == NULL) {
-        return (operation_result) {
-            ERR_MALLOC_FAILED,
-            invalid_header
-        };
+
+    if (start_address == NULL)
+    {
+        return (vector_header){
+            false,
+            NULL,
+            0,
+            0};
     }
-    
-    vector_header header = {
-        1,
+
+    return (vector_header){
+        true,
         start_address,
         0,
-        actual_capacity
-    };
-
-    return (operation_result) {
-        OK,
-        header
-    };
+        actual_capacity};
 }
 
-operation_result pop_back(vector_header header) {
-    vector_header invalid_header = get_invalid_header();
 
-    if (is_invalid(header)) {
-        return (operation_result) {
-            ERR_NOT_ALLOCATED,
-            invalid_header
-        };
+operation_result pop_back(vector_header* header)
+{
+    if (is_invalid(header))
+    {
+        return ERR_INVALID_HEADER;
     }
 
-    if (header.size == 0) {
-        return (operation_result) {
+    if (header->size == 0)
+    {
+        return (operation_result){
             OK,
-            header
-        };
+            header};
     }
 
-    header.size--;
+    header->size--;
 
-    return (operation_result) {
+    return (operation_result){
         OK,
-        header
-    };
+        header};
 }
 
+operation_result push_back(vector_header* header, long value) {
+    if (is_invalid(header)) {
+        return ERR_INVALID_HEADER;
+    }
 
+    if (header->size == header->capacity) {
+        operation_result result = grow_vector(header);
+        if (result != OK) {
+            return result;
+        }
+    }
 
-
+    *get_address(header, header->size) = value;
+    header->size++;
+    return OK;
+}

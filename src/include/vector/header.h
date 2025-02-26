@@ -4,7 +4,7 @@
 
 typedef struct {
     int is_allocated;
-    void *start_address;
+    long* start_address;
     int size;
     int capacity;
 } vector_header;
