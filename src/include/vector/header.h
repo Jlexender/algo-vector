@@ -1,7 +1,10 @@
 #pragma once
 
 typedef struct {
+    int is_allocated;
+    void *start_address;
+    int element_size;
     int size;
-    long *start_address;
+    int capacity;
 } vector_header;
 

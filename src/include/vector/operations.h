@@ -1,12 +1,22 @@
 #pragma once
 
-#include <header.h>
+#include "header.h"
 
-typedef enum
-{
+typedef enum {
     OK,
-    ERROR
-} operation_status;
+    ERR_NOT_ALLOCATED,
+    ERR_INVALID_SIZE,
+    ERR_MALLOC_FAILED
+} status_code;
 
-operation_status remove(vector_header header);
-vector_header create(int min_capacity);
+typedef struct {
+    status_code status;
+    vector_header header;
+} operation_result;
+
+operation_result init_vector(int capacity);
+operation_result remove_vector(vector_header header);
+operation_result push_back(vector_header header, long value);
+operation_result pop_back(vector_header header);
+
+
