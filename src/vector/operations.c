@@ -4,22 +4,22 @@
 #include "../include/vector/header.h"
 #include "../include/vector/operations.h"
 
-static long *get_address(vector_header *header, int offset)
+static long *get_address(const vector_header *const header, const int offset)
 {
     return header->start_address + offset * sizeof(long);
 }
 
-static int is_invalid(vector_header *header)
+static int is_invalid(const vector_header *const header)
 {
     return !header->is_allocated;
 }
 
-static void invalidate(vector_header *header)
+static void invalidate(vector_header *const header)
 {
     header->is_allocated = 0;
 }
 
-static operation_result grow_vector(vector_header *header)
+static operation_result grow_vector(vector_header *const header)
 {
     if (is_invalid(header))
     {
@@ -40,7 +40,7 @@ static operation_result grow_vector(vector_header *header)
     return OK;
 }
 
-operation_result free_vector(vector_header *header)
+operation_result free_vector(vector_header *const header)
 {
     if (is_invalid(header))
     {
@@ -53,7 +53,7 @@ operation_result free_vector(vector_header *header)
     return OK;
 }
 
-vector_header init_vector(int capacity)
+vector_header init_vector(const int capacity)
 {
     if (capacity <= 0)
     {
@@ -88,7 +88,7 @@ vector_header init_vector(int capacity)
         actual_capacity};
 }
 
-long get(vector_header *header, int index)
+long get(const vector_header *const header, const int index)
 {
     if (is_invalid(header))
     {
@@ -103,7 +103,7 @@ long get(vector_header *header, int index)
     return *get_address(header, index);
 }
 
-operation_result set(vector_header *header, int index, long value)
+operation_result set(vector_header *const header, const int index, const long value)
 {
     if (is_invalid(header))
     {
@@ -119,7 +119,7 @@ operation_result set(vector_header *header, int index, long value)
     return OK;
 }
 
-operation_result insert(vector_header *header, int index, long value)
+operation_result insert(vector_header *const header, const int index, const long value)
 {
     if (is_invalid(header))
     {
@@ -151,12 +151,12 @@ operation_result insert(vector_header *header, int index, long value)
     return OK;
 }
 
-operation_result push_back(vector_header *header, long value)
+operation_result push_back(vector_header *const header, const long value)
 {
     return insert(header, header->size, value);
 }
 
-operation_result erase(vector_header *header, int index)
+operation_result erase(vector_header *const header, const int index)
 {
     if (is_invalid(header))
     {
@@ -177,7 +177,7 @@ operation_result erase(vector_header *header, int index)
     return OK;
 }
 
-operation_result pop_back(vector_header *header)
+operation_result pop_back(vector_header *const header)
 {
     return erase(header, header->size - 1);
 }
