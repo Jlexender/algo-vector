@@ -35,10 +35,18 @@ long get(const deamortized_vector_header* header, int index) {
     return get(&header->current_vector, index);
 }
 
-operation_result set(deamortized_vector_header* const header, const int index, const long value);
+operation_result set(deamortized_vector_header* const header, const int index, const long value) {
+
+}
+
 operation_result insert(deamortized_vector_header* const header, const int index, const long value);
 operation_result push_back(deamortized_vector_header* const header, const long value);
 operation_result erase(deamortized_vector_header* const header, const int index);
-operation_result pop_back(deamortized_vector_header* const header);
+
+
+
+operation_result pop_back(deamortized_vector_header* const header) {
+    // doing this is a bit tricky
+}
 
 

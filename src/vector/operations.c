@@ -125,6 +125,8 @@ operation_result insert(vector_header *const header, const int index, const long
         return ERR_INVALID_HEADER;
     }
 
+    // note: in this implementation, insert on vector size 
+    // is considered as pushing the element back
     if (index < 0 || index > header->size)
     {
         return ERR_OUT_OF_BOUNDS;
