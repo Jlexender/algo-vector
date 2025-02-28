@@ -64,11 +64,10 @@ vector_header init_vector(const int capacity)
             0};
     }
 
-    int actual_capacity = MIN_CAPACITY;
-    while (actual_capacity < capacity)
-    {
-        actual_capacity <<= 1;
-    }
+    // FIXME: CHANGED 01.03
+    // Seems like it doesn't really affect the current impl, but I'm not sure...
+    int actual_capacity = capacity < MIN_CAPACITY ? MIN_CAPACITY : capacity;
+
 
     void *start_address = malloc(actual_capacity * sizeof(long));
 

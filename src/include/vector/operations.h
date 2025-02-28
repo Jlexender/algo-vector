@@ -1,15 +1,7 @@
 #pragma once
 
 #include "header.h"
-
-typedef enum {
-    OK,
-    ERR_INVALID_HEADER,
-    ERR_INVALID_CAPACITY,
-    ERR_MALLOC_FAILED,
-    ERR_REALLOC_FAILED,
-    ERR_OUT_OF_BOUNDS
-} operation_result;
+#include "../operation_result.h"
 
 vector_header init_vector(const int capacity);
 operation_result free_vector(vector_header* header);
@@ -19,4 +11,3 @@ operation_result insert(vector_header* const header, const int index, const long
 operation_result push_back(vector_header* const header, const long value);
 operation_result erase(vector_header* const header, const int index);
 operation_result pop_back(vector_header* const header);
-
