@@ -503,6 +503,7 @@ void deamortized_vector_tests(void)
     test_deamortized_complex_operations();
     test_deamortized_edge_cases();
     test_deamortized_capacity_management();
+    fuzz_deamortized_vector_operations();
     printf("All deamortized vector tests passed!\n");
 }
 
