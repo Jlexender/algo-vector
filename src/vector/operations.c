@@ -25,6 +25,10 @@ static void invalidate(vector_header *const header)
 }
 
 static operation_result grow_vector(vector_header *const header) {
+    if (header == NULL) {
+        return ERR_NULL;
+    }
+
     if (is_invalid(header))
     {
         return ERR_INVALID_HEADER;
@@ -46,6 +50,10 @@ static operation_result grow_vector(vector_header *const header) {
 
 operation_result free_vector(vector_header *const header)
 {
+    if (header == NULL) {
+        return ERR_NULL;
+    }
+
     if (is_invalid(header))
     {
         return ERR_INVALID_HEADER;
@@ -92,6 +100,10 @@ vector_header init_vector(const int capacity)
 
 long get(const vector_header *const header, const int index)
 {
+    if (header == NULL) {
+        return ERR_NULL;
+    }
+
     if (is_invalid(header))
     {
         return ERR_INVALID_HEADER;
@@ -107,13 +119,13 @@ long get(const vector_header *const header, const int index)
 
 operation_result set(vector_header *const header, const int index, const long value)
 {
+    if (header == NULL) {
+        return ERR_NULL;
+    }
+
     if (is_invalid(header))
     {
         return ERR_INVALID_HEADER;
-    }
-
-    if (header == NULL) {
-        return ERR_NULL;
     }
 
     if (index < 0 || index >= header->size)
@@ -174,6 +186,10 @@ operation_result push_back(vector_header *const header, const long value)
 
 operation_result erase(vector_header *const header, const int index)
 {
+    if (header == NULL) {
+        return ERR_NULL;
+    }
+
     if (is_invalid(header))
     {
         return ERR_INVALID_HEADER;
