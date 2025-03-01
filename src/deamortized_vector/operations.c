@@ -3,18 +3,21 @@
 #include "../include/deamortized_vector/operations.h"
 #include "../include/vector/operations.h"
 
+static int get_capacity(const int capacity) {
+    return capacity < MIN_CAPACITY ? MIN_CAPACITY : capacity;
+}
+
+
 deamortized_vector_header init_deamortized_vector(const int capacity)
 {
-    // Made to avoid cases where capacity < MIN_CAPACITY
-    // and therefore results in a technical error.
-    int real_capacity = capacity < MIN_CAPACITY ? MIN_CAPACITY : real_capacity;
-
     // Made to avoid corner-cases with odd size.
-    // UPDATED: bad decision
+    // Removed: bad decision
     // if (real_capacity % 2 != 0)
     // {
     //     real_capacity++;
     // }
+
+    int real_capacity = get_capacity(capacity);
 
     vector_header current = init_vector(real_capacity);
     vector_header next = init_vector(real_capacity * 2);
@@ -58,26 +61,40 @@ operation_result set(deamortized_vector_header *const header, const int index, c
 
 operation_result insert(deamortized_vector_header *const header, const int index, const long value)
 {
+    operation_result result;
+    if (index >= header->reallocated_amount) {
+        return insert(&header->current_vector, index, value);
+    }
+
+    result = insert(&header->next_vector, index, value);
+    if (result != OK) {
+        return result;
+    }
+
+    result = insert(&header->current_vector, index, value);
+    if (result != OK) {
+        return result;
+    }
+
     if (header->current_vector.size >= header->current_vector.capacity / 2)
     {
-        operation_result result = push_back(&header->next_vector, get(&header->current_vector, header->reallocated_amount++));
+        result = push_back(&header->next_vector, get(&header->current_vector, header->reallocated_amount++));
         if (result != OK)
         {
             return result;
         }
 
-        result = push_back(&header->next_vector, get(&header->current_vector, header->reallocated_amount++));
+        // we will push another element if we can
+        if (header->reallocated_amount < header->current_vector.size) {
+            result = push_back(&header->next_vector, get(&header->current_vector, header->reallocated_amount++));
 
-        if (result != OK) {
-            return result;
-        }
+            if (result != OK) {
+                return result;
+            }
+        } 
     }
 
-    if (index >= header->reallocated_amount) {
-        return insert(&header->current_vector, index, value);
-    }
-
-    operation_result result = insert(&header->next_vector)
+    return OK;
 }
 
 operation_result push_back(deamortized_vector_header *const header, const long value)

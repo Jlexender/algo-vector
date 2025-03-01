@@ -4,6 +4,10 @@
 #include "../include/vector/header.h"
 #include "../include/vector/operations.h"
 
+static int get_capacity(const int capacity) {
+    return capacity < MIN_CAPACITY ? MIN_CAPACITY : capacity;
+}
+
 static long *get_address(const vector_header *const header, const int offset)
 {
     return header->start_address + offset * sizeof(long);
@@ -66,7 +70,7 @@ vector_header init_vector(const int capacity)
 
     // FIXME: CHANGED 01.03
     // Seems like it doesn't really affect the current impl, but I'm not sure...
-    int actual_capacity = capacity < MIN_CAPACITY ? MIN_CAPACITY : capacity;
+    int actual_capacity = get_capacity(capacity);
 
     void *start_address = malloc(actual_capacity * sizeof(long));
 
