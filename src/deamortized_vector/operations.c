@@ -54,6 +54,10 @@ long deamortized_get(const deamortized_vector_header *header, int index)
 
 operation_result deamortized_set(deamortized_vector_header *const header, const int index, const long value)
 {
+    if (header == NULL) {
+        return ERR_NULL;
+    }
+    
     if (index >= header->reallocated_amount)
     {
         return set(&header->current_vector, index, value);
@@ -70,6 +74,10 @@ operation_result deamortized_set(deamortized_vector_header *const header, const 
 
 operation_result deamortized_insert(deamortized_vector_header *const header, const int index, const long value)
 {
+    if (header == NULL) {
+        return ERR_NULL;
+    }
+
     operation_result result;
 
     if (index >= header->reallocated_amount)
@@ -174,5 +182,9 @@ operation_result deamortized_pop_back(deamortized_vector_header *const header)
 
 int get_size(const deamortized_vector_header *const header)
 {
+    if (header == NULL) {
+        return ERR_NULL;
+    }
+
     return header->current_vector.size;
 }
