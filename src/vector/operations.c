@@ -113,6 +113,10 @@ operation_result set(vector_header *const header, const int index, const long va
         return ERR_INVALID_HEADER;
     }
 
+    if (header == NULL) {
+        return ERR_NULL;
+    }
+
     if (index < 0 || index >= header->size)
     {
         return ERR_OUT_OF_BOUNDS;
@@ -124,6 +128,10 @@ operation_result set(vector_header *const header, const int index, const long va
 
 operation_result insert(vector_header *const header, const int index, const long value)
 {
+    if (header == NULL) {
+        return ERR_NULL;
+    }
+
     if (is_invalid(header))
     {
         return ERR_INVALID_HEADER;
@@ -158,6 +166,10 @@ operation_result insert(vector_header *const header, const int index, const long
 
 operation_result push_back(vector_header *const header, const long value)
 {
+    if (header == NULL) {
+        return ERR_NULL;
+    }
+
     return insert(header, header->size, value);
 }
 
@@ -184,5 +196,9 @@ operation_result erase(vector_header *const header, const int index)
 
 operation_result pop_back(vector_header *const header)
 {
+    if (header == NULL) {
+        return ERR_NULL;
+    }
+
     return erase(header, header->size - 1);
 }
