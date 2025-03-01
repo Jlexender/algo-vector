@@ -3,10 +3,10 @@
 #include "../include/deamortized_vector/operations.h"
 #include "../include/vector/operations.h"
 
-static int get_capacity(const int capacity) {
+static int get_capacity(const int capacity)
+{
     return capacity < MIN_CAPACITY ? MIN_CAPACITY : capacity;
 }
-
 
 deamortized_vector_header init_deamortized_vector(const int capacity)
 {
@@ -30,6 +30,9 @@ deamortized_vector_header init_deamortized_vector(const int capacity)
 
 operation_result free_deamortized_vector(deamortized_vector_header *header)
 {
+    if (header == NULL) {
+        return ERR_NULL;
+    }
     operation_result result = free_vector(&header->next_vector);
     if (result != OK)
     {
@@ -63,41 +66,51 @@ operation_result deamortized_set(deamortized_vector_header *const header, const 
 operation_result deamortized_insert(deamortized_vector_header *const header, const int index, const long value)
 {
     operation_result result;
+
     if (index >= header->reallocated_amount) {
-        return insert(&header->current_vector, index, value);
-    }
+        result = insert(&header->current_vector, index, value);
+        if (result != OK) {
+            return result;
+        }
+    } else {
+        result = insert(&header->next_vector, index, value);
+        if (result != OK) {
+            return result;
+        }
 
-    result = insert(&header->next_vector, index, value);
-    if (result != OK) {
-        return result;
-    }
+        header->reallocated_amount++;
 
-    result = insert(&header->current_vector, index, value);
-    if (result != OK) {
-        return result;
+        result = insert(&header->current_vector, index, value);
+        if (result != OK) {
+            return result;
+        }
     }
 
     if (header->current_vector.size >= header->current_vector.capacity / 2)
     {
         result = push_back(&header->next_vector, get(&header->current_vector, header->reallocated_amount++));
+
         if (result != OK)
         {
             return result;
         }
 
-        // we will push another element if we can
-        if (header->reallocated_amount < header->current_vector.size) {
+        if (header->current_vector.size != header->reallocated_amount)
+        {
             result = push_back(&header->next_vector, get(&header->current_vector, header->reallocated_amount++));
 
-            if (result != OK) {
+            if (result != OK)
+            {
                 return result;
             }
-        } 
+        }
     }
 
-    if (header->reallocated_amount == header->current_vector.size) {
-        const vector_header new_vector = init_vector(header->next_vector.capacity * 2);
-        if (!new_vector.is_allocated) {
+    if (header->current_vector.size == header->current_vector.capacity)
+    {
+        vector_header new_vector = init_vector(header->next_vector.capacity * 2);
+
+        if (new_vector.is_allocated == 0) {
             return ERR_INVALID_HEADER;
         }
 
@@ -108,7 +121,9 @@ operation_result deamortized_insert(deamortized_vector_header *const header, con
 
         header->current_vector = header->next_vector;
         header->next_vector = new_vector;
+        header->reallocated_amount = 0;
     }
+        
 
     return OK;
 }
@@ -141,6 +156,7 @@ operation_result deamortized_pop_back(deamortized_vector_header *const header)
     return deamortized_erase(header, header->current_vector.size - 1);
 }
 
-int get_size(const deamortized_vector_header *const header) {
+int get_size(const deamortized_vector_header *const header)
+{
     return header->current_vector.size;
 }
