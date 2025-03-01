@@ -2,10 +2,10 @@
 
 #define MIN_CAPACITY 32
 
-typedef struct {
+typedef struct
+{
     int is_allocated;
-    long* start_address;
+    long *start_address;
     int size;
     int capacity;
 } vector_header;
-

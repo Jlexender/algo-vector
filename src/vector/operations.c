@@ -68,7 +68,6 @@ vector_header init_vector(const int capacity)
     // Seems like it doesn't really affect the current impl, but I'm not sure...
     int actual_capacity = capacity < MIN_CAPACITY ? MIN_CAPACITY : capacity;
 
-
     void *start_address = malloc(actual_capacity * sizeof(long));
 
     if (start_address == NULL)
@@ -125,7 +124,7 @@ operation_result insert(vector_header *const header, const int index, const long
         return ERR_INVALID_HEADER;
     }
 
-    // note: in this implementation, insert on vector size 
+    // note: in this implementation, insert on vector size
     // is considered as pushing the element back
     if (index < 0 || index > header->size)
     {

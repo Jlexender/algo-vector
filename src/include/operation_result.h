@@ -1,6 +1,7 @@
 #pragma once
 
-typedef enum {
+typedef enum
+{
     OK,
     ERR_INVALID_HEADER,
     ERR_INVALID_CAPACITY,
