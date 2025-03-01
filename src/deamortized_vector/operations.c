@@ -24,7 +24,8 @@ deamortized_vector_header init_deamortized_vector(const int capacity)
 
     return (deamortized_vector_header){
         current,
-        next};
+        next,
+        0};
 }
 
 operation_result free_deamortized_vector(deamortized_vector_header *header)
@@ -38,12 +39,12 @@ operation_result free_deamortized_vector(deamortized_vector_header *header)
     return free_vector(&header->current_vector);
 }
 
-long get(const deamortized_vector_header *header, int index)
+long deamortized_get(const deamortized_vector_header *header, int index)
 {
     return get(&header->current_vector, index);
 }
 
-operation_result set(deamortized_vector_header *const header, const int index, const long value)
+operation_result deamortized_set(deamortized_vector_header *const header, const int index, const long value)
 {
     if (index >= header->reallocated_amount)
     {
@@ -59,7 +60,7 @@ operation_result set(deamortized_vector_header *const header, const int index, c
     return set(&header->current_vector, index, value);
 }
 
-operation_result insert(deamortized_vector_header *const header, const int index, const long value)
+operation_result deamortized_insert(deamortized_vector_header *const header, const int index, const long value)
 {
     operation_result result;
     if (index >= header->reallocated_amount) {
@@ -94,15 +95,30 @@ operation_result insert(deamortized_vector_header *const header, const int index
         } 
     }
 
+    if (header->reallocated_amount == header->current_vector.size) {
+        const vector_header new_vector = init_vector(header->next_vector.capacity * 2);
+        if (!new_vector.is_allocated) {
+            return ERR_INVALID_HEADER;
+        }
+
+        result = free_vector(&header->current_vector);
+        if (result != OK) {
+            return result;
+        }
+
+        header->current_vector = header->next_vector;
+        header->next_vector = new_vector;
+    }
+
     return OK;
 }
 
-operation_result push_back(deamortized_vector_header *const header, const long value)
+operation_result deamortized_push_back(deamortized_vector_header *const header, const long value)
 {
-    return insert(header, header->current_vector.size, value);
+    return deamortized_insert(header, header->current_vector.size, value);
 }
 
-operation_result erase(deamortized_vector_header *const header, const int index)
+operation_result deamortized_erase(deamortized_vector_header *const header, const int index)
 {
     if (index >= header->reallocated_amount)
     {
@@ -120,7 +136,11 @@ operation_result erase(deamortized_vector_header *const header, const int index)
     return erase(&header->current_vector, index);
 }
 
-operation_result pop_back(deamortized_vector_header *const header)
+operation_result deamortized_pop_back(deamortized_vector_header *const header)
 {
-    return erase(header, header->current_vector.size - 1);
+    return deamortized_erase(header, header->current_vector.size - 1);
+}
+
+int get_size(const deamortized_vector_header *const header) {
+    return header->current_vector.size;
 }

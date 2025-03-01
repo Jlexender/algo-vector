@@ -1,18 +1,18 @@
 #include <stdio.h>
-#include "include/vector.h"
+#include "include/deamortized_vector.h"
 
 int main(void)
 {
-    vector_header header = init_vector(30);
+    deamortized_vector_header header = init_deamortized_vector(30);
 
     for (int i = 0; i < 100; ++i)
     {
-        push_back(&header, i + 1);
+        deamortized_push_back(&header, i + 1);
     }
 
-    for (int i = 0; i < header.size; ++i)
+    for (int i = 0; i < get_size(&header); ++i)
     {
-        printf("%ld ", get(&header, i));
+        printf("%ld ", deamortized_get(&header, i));
     }
     puts("\n");
 
