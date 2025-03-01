@@ -4,7 +4,8 @@
 #include "../include/vector/header.h"
 #include "../include/vector/operations.h"
 
-static int get_capacity(const int capacity) {
+static int get_capacity(const int capacity)
+{
     return capacity < MIN_CAPACITY ? MIN_CAPACITY : capacity;
 }
 

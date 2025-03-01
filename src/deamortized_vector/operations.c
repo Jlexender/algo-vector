@@ -30,7 +30,8 @@ deamortized_vector_header init_deamortized_vector(const int capacity)
 
 operation_result free_deamortized_vector(deamortized_vector_header *header)
 {
-    if (header == NULL) {
+    if (header == NULL)
+    {
         return ERR_NULL;
     }
     operation_result result = free_vector(&header->next_vector);
@@ -67,21 +68,27 @@ operation_result deamortized_insert(deamortized_vector_header *const header, con
 {
     operation_result result;
 
-    if (index >= header->reallocated_amount) {
+    if (index >= header->reallocated_amount)
+    {
         result = insert(&header->current_vector, index, value);
-        if (result != OK) {
+        if (result != OK)
+        {
             return result;
         }
-    } else {
+    }
+    else
+    {
         result = insert(&header->next_vector, index, value);
-        if (result != OK) {
+        if (result != OK)
+        {
             return result;
         }
 
         header->reallocated_amount++;
 
         result = insert(&header->current_vector, index, value);
-        if (result != OK) {
+        if (result != OK)
+        {
             return result;
         }
     }
@@ -110,20 +117,17 @@ operation_result deamortized_insert(deamortized_vector_header *const header, con
     {
         vector_header new_vector = init_vector(header->next_vector.capacity * 2);
 
-        if (new_vector.is_allocated == 0) {
+        if (new_vector.is_allocated == 0)
+        {
             return ERR_INVALID_HEADER;
         }
 
-        result = free_vector(&header->current_vector);
-        if (result != OK) {
-            return result;
-        }
+        free_vector(&header->current_vector);
 
         header->current_vector = header->next_vector;
         header->next_vector = new_vector;
         header->reallocated_amount = 0;
     }
-        
 
     return OK;
 }
