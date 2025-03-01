@@ -45,6 +45,10 @@ operation_result free_deamortized_vector(deamortized_vector_header *header)
 
 long deamortized_get(const deamortized_vector_header *header, int index)
 {
+    if (header == NULL) {
+        return ERR_NULL;
+    }
+    
     return get(&header->current_vector, index);
 }
 
@@ -134,11 +138,19 @@ operation_result deamortized_insert(deamortized_vector_header *const header, con
 
 operation_result deamortized_push_back(deamortized_vector_header *const header, const long value)
 {
+    if (header == NULL) {
+        return ERR_NULL;
+    }
+
     return deamortized_insert(header, header->current_vector.size, value);
 }
 
 operation_result deamortized_erase(deamortized_vector_header *const header, const int index)
 {
+    if (header == NULL) {
+        return ERR_NULL;
+    }
+
     if (index >= header->reallocated_amount)
     {
         return erase(&header->current_vector, index);

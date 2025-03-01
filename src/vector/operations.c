@@ -11,7 +11,7 @@ static int get_capacity(const int capacity)
 
 static long *get_address(const vector_header *const header, const int offset)
 {
-    return header->start_address + offset * sizeof(long);
+    return header->start_address + offset;
 }
 
 static int is_invalid(const vector_header *const header)
@@ -24,8 +24,7 @@ static void invalidate(vector_header *const header)
     header->is_allocated = 0;
 }
 
-static operation_result grow_vector(vector_header *const header)
-{
+static operation_result grow_vector(vector_header *const header) {
     if (is_invalid(header))
     {
         return ERR_INVALID_HEADER;
